@@ -15,7 +15,18 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, Grad
 
 import time
 
+# CORS (Cross-Origin Resource Sharing) middleware to allow requests from React
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def on_startup():
