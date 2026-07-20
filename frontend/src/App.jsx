@@ -63,6 +63,7 @@ function App() {
    * Returns an array like: [{ feature: "petal length (cm)", importance: 0.32 }, ...]
    * sorted from most to least important
    */
+
   const getChartData = (result) => {
     if (!result) return []
 
@@ -72,30 +73,26 @@ function App() {
     const meanAbsShap = featureNames.map((name, i) => {
       let values = []
 
-      // SHAP output shape depends on model type:
-      // Multiclass (e.g. Random Forest with 3 classes): [classes][samples][features] — 3D array
-      // Binary/regression (e.g. Logistic Regression): [samples][features] — 2D array
-      // Check if first element's first element is also an array to detect 3D
+      // Check if 3D array: (samples, features, classes)
       if (Array.isArray(shapValues[0][0])) {
-        // 3D: loop through each class, then each sample
-        shapValues.forEach(classValues => {
-          classValues.forEach(sample => {
-            values.push(Math.abs(sample[i]))
+        // 3D: shapValues[sample][feature][class]
+        // we want all values for feature i across all samples and classes
+        shapValues.forEach(sample => {
+          sample[i].forEach(classVal => {
+            values.push(Math.abs(classVal))
           })
         })
       } else {
-        // 2D: loop through each sample directly
+        // 2D: shapValues[sample][feature]
         shapValues.forEach(sample => {
           values.push(Math.abs(sample[i]))
         })
       }
 
-      // Calculate mean of all collected absolute SHAP values for this feature
       const mean = values.reduce((a, b) => a + b, 0) / values.length
       return { feature: name, importance: parseFloat(mean.toFixed(4)) }
     })
 
-    // Sort features from most to least important for cleaner visualization
     return meanAbsShap.sort((a, b) => b.importance - a.importance)
   }
 

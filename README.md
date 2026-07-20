@@ -14,3 +14,6 @@ npm run dev
 
 ## Run Database
 Open psql shell and connect to `capstone` database.
+```powershell
+\c capstone
+```
